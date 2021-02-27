@@ -40,7 +40,7 @@ size_t PageLoader::CurlWrite_CallbackFunc_StdString(void* contents, size_t size,
    try {
        s->append((char*)contents, newLength);
    } catch(std::bad_alloc &e) {
-       //handle memory problem
+       std::cerr <<  "memory problem" << std::endl;
        return 0;
    }
    return newLength;

@@ -1,7 +1,7 @@
 #include "Page.hpp"
 
-Page::Page(const std::string& s) {
-    body = s;
+Page::Page(const std::string& body) {
+    this->body = body;
 }
 
 int Page::isError() const {

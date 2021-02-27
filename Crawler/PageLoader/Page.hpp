@@ -12,10 +12,15 @@ private:
 
 public:
     
-    Page(const std::string&);
+    /**
+     * Creates a page with a given body
+     */
+    Page(const std::string& body);
     
     int isError() const;
+    
     const std::string& getBody() const;
+    
     int getStatus() const;
 };
 
