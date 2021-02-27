@@ -1,11 +1,11 @@
 #include <iostream>
-#include "Page.hpp"
+#include "Crawler/PageLoader/Page.hpp"
 
 #include <stdio.h>
 #include <curl/curl.h>
 
 size_t CurlWrite_CallbackFunc_StdString(void *contents, size_t size, size_t nmemb, std::string *s) {
-    size_t newLength = size*nmemb;
+    size_t newLength = size * nmemb;
     try
     {
         s->append((char*)contents, newLength);
@@ -27,7 +27,6 @@ int main(void) {
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, "curl.haxx.se");
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
         
