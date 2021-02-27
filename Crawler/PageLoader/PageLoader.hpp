@@ -9,7 +9,7 @@ public:
     
     PageLoader();
 
-    //libcurl 
+    //libcurl
     Page load(const std::string& url);
 };
 #endif // !PAGE_LOADER_HPP
