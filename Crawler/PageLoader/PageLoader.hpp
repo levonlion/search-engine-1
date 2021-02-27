@@ -5,11 +5,16 @@
 #include "Page.hpp"
 
 class PageLoader {
+    
 public:
     
     PageLoader();
 
-    //libcurl
     Page load(const std::string& url);
+    
+private:
+    
+    static size_t CurlWrite_CallbackFunc_StdString(void* contents, size_t size, size_t nmemb, std::string* s);
 };
+
 #endif // !PAGE_LOADER_HPP
