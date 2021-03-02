@@ -15,7 +15,7 @@ main.o: main.cpp
 PageLoader.o: ./Crawler/PageLoader/PageLoader.cpp 
 	$(CXX) $(CXXFLAGS) -c ./Crawler/PageLoader/PageLoader.cpp -o PageLoader.o
 
-Page.o:
+Page.o: ./Crawler/PageLoader/Page.cpp 
 	$(CXX) $(CXXFLAGS) -c ./Crawler/PageLoader/Page.cpp -o Page.o
 
 clean:
