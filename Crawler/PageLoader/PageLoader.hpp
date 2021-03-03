@@ -14,7 +14,7 @@ public:
     
 private:
     
-    static size_t CurlWrite_CallbackFunc_StdString(void* contents, size_t size, size_t nmemb, std::string* s);
+    static size_t CurlWrite_CallbackFunc_StdString(char* contents, size_t size, size_t nmemb, std::string* s);
 };
 
 #endif // !PAGE_LOADER_HPP
