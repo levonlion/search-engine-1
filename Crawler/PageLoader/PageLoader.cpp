@@ -11,7 +11,7 @@ PageLoader::PageLoader() {
 Page PageLoader::load(const std::string& url) {
     CURL* curl;
     
-    // The initial value is for internal use only, will never be returned by libcurl
+    // The initial value is for internal use only, will never be returned by libcurl.
     CURLcode res = CURLE_NO_CONNECTION_AVAILABLE;
     
     std::string data;
@@ -26,17 +26,17 @@ Page PageLoader::load(const std::string& url) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
         
-        // Perform the request, res will get the return code
+        // Perform the request, res will get the return code.
         res = curl_easy_perform(curl);
         
-        // Check for errors
+        // Check for errors.
         if(res != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         } else {
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
         }
         
-        // always cleanup
+        // Always cleanup.
         curl_easy_cleanup(curl);
     }
     

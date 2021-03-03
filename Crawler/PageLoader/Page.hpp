@@ -39,7 +39,7 @@ public:
     Page(const std::string& body, statusType status, errorType error);
     
     /**
-     * @return The entire request value
+     * @return The entire request value.
      */
     errorType isError() const;
     
