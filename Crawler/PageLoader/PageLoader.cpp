@@ -12,7 +12,7 @@ Page PageLoader::load(const std::string& url) {
     CURL* curl;
     
     // The initial value is for internal use only, will never be returned by libcurl.
-    CURLcode res = CURLE_NO_CONNECTION_AVAILABLE;
+    CURLcode requestResult = CURLE_NO_CONNECTION_AVAILABLE;
     
     std::string data;
     
@@ -27,11 +27,11 @@ Page PageLoader::load(const std::string& url) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
         
         // Perform the request, res will get the return code.
-        res = curl_easy_perform(curl);
+        requestResult = curl_easy_perform(curl);
         
         // Check for errors.
-        if(res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        if(requestResult != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(requestResult));
         } else {
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
         }
@@ -40,7 +40,7 @@ Page PageLoader::load(const std::string& url) {
         curl_easy_cleanup(curl);
     }
     
-    return Page(data, responseCode, res);
+    return Page(data, responseCode, requestResult);
 }
 
 size_t PageLoader::CurlWrite_CallbackFunc_StdString(char* contents, size_t size, size_t nmemb, std::string* s) {
