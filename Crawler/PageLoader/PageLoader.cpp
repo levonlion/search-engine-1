@@ -9,7 +9,7 @@ PageLoader::PageLoader() {
 }
 
 Page PageLoader::load(const std::string& url) {
-    CURL* curl;
+    CURL* curl = curl_easy_init();
     
     // The initial value is for internal use only, will never be returned by libcurl.
     CURLcode requestResult = CURLE_NO_CONNECTION_AVAILABLE;
@@ -19,7 +19,6 @@ Page PageLoader::load(const std::string& url) {
     // The initial value of 0 means that no server response code has been received.
     Page::statusType responseCode = 0;
     
-    curl = curl_easy_init();
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Crawler/PageLoader/PageLoader.hpp"
+#include "PageLoader.hpp"
 
 int main() {
     PageLoader pl;
