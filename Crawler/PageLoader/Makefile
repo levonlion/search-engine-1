@@ -4,19 +4,24 @@ CXXFLAGS = -std=c++11 -Wall
 # Libraries
 LDLIBS = -lcurl
 
-all: main
+#names
+main = test
+firstFile = PageLoader
+secondFile = Page
 
-main: main.o PageLoader.o Page.o
-	$(CXX) $(CXXFLAGS) $(LDLIBS) main.o PageLoader.o Page.o -o main
+all: $(main)
 
-main.o: main.cpp
-	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
+$(main): $(main).o $(firstFile).o $(secondFile).o
+    $(CXX) $(CXXFLAGS) $(LDLIBS) $(main).o $(firstFile).o $(secondFile).o -o $(main)
 
-PageLoader.o: ./Crawler/PageLoader/PageLoader.cpp 
-	$(CXX) $(CXXFLAGS) -c ./Crawler/PageLoader/PageLoader.cpp -o PageLoader.o
+$(main).o: $(main).cpp
+    $(CXX) $(CXXFLAGS) -c $(main).cpp -o $(main).o
 
-Page.o: ./Crawler/PageLoader/Page.cpp 
-	$(CXX) $(CXXFLAGS) -c ./Crawler/PageLoader/Page.cpp -o Page.o
+$(firstFile).o: $(firstFile).cpp
+    $(CXX) $(CXXFLAGS) -c $(firstFile).cpp -o $(firstFile).o
+
+$(secondFile).o: $(secondFile).cpp
+    $(CXX) $(CXXFLAGS) -c $(secondFile).cpp -o $(secondFile).o
 
 clean:
-	rm *.o main
+    rm *.o $(main)
