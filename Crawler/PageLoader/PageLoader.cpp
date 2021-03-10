@@ -22,7 +22,7 @@ Page PageLoader::load(const std::string& url) {
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
         
         // Perform the request, res will get the return code.
@@ -42,7 +42,7 @@ Page PageLoader::load(const std::string& url) {
     return Page(data, responseCode, requestResult);
 }
 
-size_t PageLoader::CurlWrite_CallbackFunc_StdString(char* contents, size_t size, size_t nmemb, std::string* s) {
+size_t PageLoader::curlCallback(char* contents, size_t size, size_t nmemb, std::string* s) {
    size_t newLength = size * nmemb;
    try {
        s->append(contents, newLength);

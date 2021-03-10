@@ -4,6 +4,7 @@
 #include <string>
 #include <curl/curl.h>
 
+//TODO: save effective url, instead of requested url
 class Page {
     
 public:
