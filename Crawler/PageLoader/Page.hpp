@@ -14,7 +14,7 @@ public:
 private:
     
     /**
-     * The effective url of the site.
+     * The effective url.
      */
     std::string url;
     
@@ -37,6 +37,7 @@ public:
     
     /**
      * Creates a page with a given body, status and error.
+     * @param url The effective url.
      * @param body The entire HTML document.
      * @param status The HTTP, FTP or SMTP response code.
      * @param error The return value of the entire request.
