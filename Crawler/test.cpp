@@ -13,12 +13,12 @@ int main() {
     PageLoader pL;
     Page res = pL.load(url);
     
-    Parser parser(url, res.getBody());
+    Parser parser(res.getUrl(), res.getBody());
     
     parser.parse();
 
-    for (const std::string& u : parser.getUrls()) {
-        std::cout << u << std::endl;
-    }
+//    for (const std::string& u : parser.getUrls()) {
+//        std::cout << u << std::endl;
+//    }
     
 }

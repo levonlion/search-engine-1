@@ -19,6 +19,7 @@ Page PageLoader::load(const std::string& url) {
     // The initial value of 0 means that no server response code has been received.
     Page::statusType responseCode = 0;
     
+    std::string effectiveUrl;
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -33,13 +34,19 @@ Page PageLoader::load(const std::string& url) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(requestResult));
         } else {
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
+            
+            char* url = nullptr;
+            curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+            
+            if (url != nullptr) {
+                effectiveUrl.append(url);
+            }
         }
         
         // Always cleanup.
         curl_easy_cleanup(curl);
     }
-    
-    return Page(data, responseCode, requestResult);
+    return Page(effectiveUrl, data, responseCode, requestResult);
 }
 
 size_t PageLoader::curlCallback(char* contents, size_t size, size_t nmemb, std::string* s) {

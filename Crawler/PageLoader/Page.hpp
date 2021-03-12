@@ -4,7 +4,6 @@
 #include <string>
 #include <curl/curl.h>
 
-//TODO: save effective url, instead of requested url
 class Page {
     
 public:
@@ -13,6 +12,11 @@ public:
     typedef CURLcode errorType;
     
 private:
+    
+    /**
+     * The effective url of the site.
+     */
+    std::string url;
     
     /**
      * The entire HTML document.
@@ -37,7 +41,7 @@ public:
      * @param status The HTTP, FTP or SMTP response code.
      * @param error The return value of the entire request.
      */
-    Page(const std::string& body, statusType status, errorType error);
+    Page(const std::string& url, const std::string& body, statusType status, errorType error);
     
     /**
      * @return The entire request value.
@@ -53,6 +57,11 @@ public:
      * @return The HTTP, FTP or SMTP response code.
      */
     statusType getStatus() const;
+    
+    /**
+     * @return The effective url.
+     */
+    const std::string& getUrl() const;
 };
 
 #endif // !Page_hpp
