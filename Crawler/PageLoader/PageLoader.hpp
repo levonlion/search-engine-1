@@ -1,5 +1,5 @@
-#ifndef Page_Loader_hpp
-#define Page_Loader_hpp
+#ifndef PageLoader_hpp
+#define PageLoader_hpp
 
 #include <string>
 #include "Page.hpp"
@@ -23,4 +23,4 @@ private:
     static size_t curlCallback(char* contents, size_t size, size_t nmemb, std::string* s);
 };
 
-#endif // !Page_Loader_hpp
+#endif // !PageLoader_hpp
