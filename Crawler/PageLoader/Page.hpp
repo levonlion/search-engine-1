@@ -1,5 +1,5 @@
-#ifndef PAGE_HPP
-#define PAGE_HPP
+#ifndef Page_hpp
+#define Page_hpp
 
 #include <string>
 #include <curl/curl.h>
@@ -55,4 +55,4 @@ public:
     statusType getStatus() const;
 };
 
-#endif // !PAGE_HPP
+#endif // !Page_hpp
