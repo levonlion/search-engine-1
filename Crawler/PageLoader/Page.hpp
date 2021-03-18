@@ -24,7 +24,7 @@ private:
     std::string body;
     
     /**
-     * The HTTP, FTP or SMTP response code.
+     * The HTTP response code.
      */
     statusType status;
 
@@ -39,7 +39,7 @@ public:
      * Creates a page with a given body, status and error.
      * @param url The effective url.
      * @param body The entire HTML document.
-     * @param status The HTTP, FTP or SMTP response code.
+     * @param status The HTTP response code.
      * @param error The return value of the entire request.
      */
     Page(const std::string& url, const std::string& body, statusType status, errorType error);
