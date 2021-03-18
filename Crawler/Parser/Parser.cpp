@@ -18,8 +18,29 @@ void Parser::extractUrls(GumboNode* node) {
             return;
         }
 
-        //TODO: make relative to absolute (\ is means that we need to concatenate it home url and no \ means that we need concatenate it with current url, we can get it from libcurl), skip out of rau links, skip # and skip empties
-        this->urls.push_back(std::string(href->value));
+        //TODO: make relative to absolute
+        std::string parsedUrl(href->value);
+        
+        //TODO: get
+        // http://
+        // if https://
+        // /inch-vorMiBan
+        // inch-vorMiBan
+        // //
+        
+        //TODO: skip
+        // if : then skip (skip protocols with :)
+        // #anything
+        // subdomens
+        
+        // or with boost library, with wget sources, ...
+        
+        // https://rau.am/page          + /abc  = https://rau.am/abc
+        // https://rau.am/page/other    + abc   = https://rau.am/page/abc
+        // https://rau.am/page/other/   + abc   = https://rau.am/page/other/abc
+        // https://rau.am/page/other/   + /abc  = https://rau.am/abc
+        
+        this->urls.push_back(parsedUrl);
     }
 
     GumboVector *children = &node->v.element.children;
