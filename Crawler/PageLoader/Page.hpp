@@ -55,7 +55,7 @@ public:
     const std::string& getBody() const;
     
     /**
-     * @return The HTTP, FTP or SMTP response code.
+     * @return The HTTP response code.
      */
     statusType getStatus() const;
     
