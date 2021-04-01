@@ -2,9 +2,16 @@
 
 #include <gumbo.h>
 
+#include <optional>
+#include <algorithm>
+
 Parser::Parser(const std::string& url, const std::string& html) {
-    this->url = url;
-    this->html = html;
+    this->url   = url;
+    this->html  = html;
+    
+    this->urlHost   = this->host(url).value();
+    this->urlPath   = this->path(url).value();
+    this->urlScheme = this->scheme(url).value();
 }
 
 void Parser::extractUrls(GumboNode* node) {
@@ -18,29 +25,23 @@ void Parser::extractUrls(GumboNode* node) {
             return;
         }
 
-        //TODO: make relative to absolute
         std::string parsedUrl(href->value);
         
-        //TODO: get
-        // http://
-        // if https://
-        // /inch-vorMiBan
-        // inch-vorMiBan
-        // //
-        
-        //TODO: skip
-        // if : then skip (skip protocols with :)
-        // #anything
-        // subdomens
-        
-        // or with boost library, with wget sources, ...
-        
-        // https://rau.am/page          + /abc  = https://rau.am/abc
-        // https://rau.am/page/other    + abc   = https://rau.am/page/abc
-        // https://rau.am/page/other/   + abc   = https://rau.am/page/other/abc
-        // https://rau.am/page/other/   + /abc  = https://rau.am/abc
-        
-        this->urls.push_back(parsedUrl);
+        if (scheme(parsedUrl).has_value()) {
+            if (host(parsedUrl).value() == this->urlHost) {
+                this->urls.push_back(parsedUrl);
+            }
+        } else if (parsedUrl.size() > 1 && parsedUrl.front() == '/') {
+            if (parsedUrl[1] != '/') {
+                parsedUrl = this->urlScheme + "://" + this->urlHost + parsedUrl;
+                this->urls.push_back(parsedUrl);
+            }
+        } else if (!parsedUrl.empty() && parsedUrl.front() != '#') {
+            std::string::iterator backslashPosition = std::find(this->urlPath.rbegin(), this->urlPath.rend(), '/').base();
+            std::string urlPath(this->urlPath.begin(), ++backslashPosition);
+            parsedUrl = this->urlScheme + "://" + this->urlHost + urlPath + parsedUrl;
+            this->urls.push_back(parsedUrl);
+        }
     }
 
     GumboVector *children = &node->v.element.children;
@@ -60,3 +61,63 @@ const std::vector<std::string>& Parser::getUrls() const {
     return this->urls;
 }
 
+std::optional<std::string> Parser::scheme(const std::string& url) {
+    
+    auto found = url.find(":");
+    if (found != std::string::npos) {
+        return std::string(url, 0, found);
+    }
+    
+    return {};
+}
+
+std::optional<std::string> Parser::host(const std::string& url) {
+    
+    auto beginIndex = url.find(":");
+    if (beginIndex == std::string::npos) {
+        return {};
+    }
+    
+    // For ignoring ://
+    beginIndex += 3;
+    
+    auto userInfoEnd = url.find('@', beginIndex);
+    if (userInfoEnd != std::string::npos) {
+        beginIndex = userInfoEnd + 1;
+    }
+    
+    auto endIndex = url.find(':', beginIndex);
+    if (endIndex != std::string::npos) {
+        return std::string(url, beginIndex, endIndex - beginIndex);
+    }
+    
+
+    endIndex = url.find('/', beginIndex);
+    if (endIndex != std::string::npos) {
+        return std::string(url, beginIndex, endIndex - beginIndex);
+    }
+    
+    return std::string(url, beginIndex, url.size() - beginIndex);;
+}
+
+std::optional<std::string> Parser::path(const std::string& url) {
+    auto beginIndex = url.find(":");
+    if (beginIndex == std::string::npos) {
+        return {};
+    }
+    
+    // For ignoring ://
+    beginIndex += 3;
+    
+    beginIndex = url.find('/', beginIndex);
+    if (beginIndex == std::string::npos) {
+        return "/";
+    }
+    
+    auto endIndex = url.rfind('/');
+    if (endIndex != std::string::npos) {
+        return std::string(url, beginIndex, endIndex - beginIndex - 1);
+    }
+    
+    return "/";
+}
