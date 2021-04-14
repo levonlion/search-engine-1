@@ -25,5 +25,5 @@ LinkStatus Link::getStatus() const {
 }
 
 bool Link::operator==(const Link& other) {
-    return this->domain == other.domain;
+    return this->url == other.url;
 }
