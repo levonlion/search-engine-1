@@ -155,8 +155,9 @@ std::string Parser::extractCleanText(GumboNode* node) const {
 }
 
 std::string Parser::extractTitle(const GumboNode* root) const {
-    assert(root->type == GUMBO_NODE_ELEMENT);
-    assert(root->v.element.children.length >= 2);
+    if (root->type != GUMBO_NODE_ELEMENT || root->v.element.children.length < 2) {
+        return "";
+    }
     
     const GumboVector* rootChildren = &root->v.element.children;
     GumboNode* head = NULL;
@@ -167,7 +168,10 @@ std::string Parser::extractTitle(const GumboNode* root) const {
             break;
         }
     }
-    assert(head != NULL);
+    
+    if (head == NULL) {
+        return "";
+    }
     
     GumboVector* head_children = &head->v.element.children;
     for (int i = 0; i < head_children->length; ++i) {
