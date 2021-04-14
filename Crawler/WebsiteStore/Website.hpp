@@ -38,9 +38,9 @@ public:
     
     Website& operator=(const Website&) = default;
     
-    std::string getDomain() const;
+    const std::string& getDomain() const;
     
-    std::string getHomepage() const;
+    const std::string& getHomepage() const;
     
     time_t getLastCrawlingTime() const;
 };
