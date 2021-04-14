@@ -17,6 +17,8 @@ public:
     std::vector<Document> getAll() const;
     
     void save(const Document& document);
+    
+    std::size_t count() const;
 };
 
 

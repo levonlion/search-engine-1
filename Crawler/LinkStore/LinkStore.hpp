@@ -23,6 +23,8 @@ public:
     void add(const Link& link);
     
     void update(const Link& link);
+    
+    std::size_t count() const;
 };
 
 

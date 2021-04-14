@@ -43,3 +43,7 @@ void LinkStore::update(const Link& link) {
     }
     
 }
+
+std::size_t LinkStore::count() const {
+    return this->all.size();
+}

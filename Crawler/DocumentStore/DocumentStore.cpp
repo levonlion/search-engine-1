@@ -15,3 +15,6 @@ void DocumentStore::save(const Document& document) {
     this->all[document.getUrl()] = document;
 }
 
+std::size_t DocumentStore::count() const {
+    return this->all.size();
+}
