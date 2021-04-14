@@ -8,17 +8,17 @@ Page::Page(const std::string& url, const std::string& body, statusType status, e
 }
 
 Page::errorType Page::isError() const {
-    return error;
+    return this->error;
 }
 
 const std::string& Page::getBody() const {
-    return body;
+    return this->body;
 }
 
 Page::statusType Page::getStatus() const {
-    return status;
+    return this->status;
 }
 
 const std::string& Page::getUrl() const {
-    return url;
+    return this->url;
 }
