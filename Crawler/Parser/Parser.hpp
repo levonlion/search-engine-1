@@ -46,7 +46,15 @@ private:
      * Title inside <head>.
      */
     std::string title;
+    
+    /**
+     * Content of the content attribute of <meta name="description" content="Some content">
+     */
     std::string description;
+    
+    /**
+     * All clean text.
+     */
     std::string allText;
     
 private:
@@ -56,10 +64,19 @@ private:
      */
     void extractUrls(GumboNode* node);
     
+    /**
+     * Extracts clean text.
+     */
     std::string extractCleanText(GumboNode* node) const;
     
+    /**
+     * Extracts title tag content of the head tag.
+     */
     std::string extractTitle(const GumboNode* root) const;
     
+    /**
+     * Extract content of the content attribute of <meta name="description" content="Some content">
+     */
     void extractDescription(GumboNode* node);
     
     /**
@@ -96,10 +113,19 @@ public:
      */
     const std::vector<std::string>& getUrls() const;
     
+    /**
+     * @return Title tag content of the head tag.
+     */
     const std::string& getTitle() const;
     
+    /**
+     * @return Content of the content attribute of <meta name="description" content="Some content">
+     */
     const std::string& getDescription() const;
     
+    /**
+     * @return All clean text.
+     */
     const std::string& getAllText() const;
 };
 
