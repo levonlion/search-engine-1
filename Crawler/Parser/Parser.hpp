@@ -56,6 +56,12 @@ private:
      */
     void extractUrls(GumboNode* node);
     
+    std::string extractCleanText(GumboNode* node) const;
+    
+    std::string extractTitle(const GumboNode* root) const;
+    
+    void extractDescription(GumboNode* node);
+    
     /**
      * @return The scheme of url.
      */
@@ -90,8 +96,11 @@ public:
      */
     const std::vector<std::string>& getUrls() const;
     
-
+    const std::string& getTitle() const;
+    
+    const std::string& getDescription() const;
+    
+    const std::string& getAllText() const;
 };
-
 
 #endif /* Parser_hpp */
