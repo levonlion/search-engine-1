@@ -4,14 +4,19 @@
 
 #include <optional>
 #include <algorithm>
+#include <regex>
+#include <stdexcept>
 
 Parser::Parser(const std::string& url, const std::string& html) {
     this->url   = url;
     this->html  = html;
     
-    this->urlHost   = this->host(url).value();
-    this->urlPath   = this->path(url).value();
-    this->urlScheme = this->scheme(url).value();
+    std::tie(this->urlScheme, this->urlHost, this->urlPath) = this->parseUrl(url);
+    
+    if (this->urlPath.empty()) {
+        this->urlPath = "/";
+        this->url += "/";
+    }
 }
 
 void Parser::extractUrls(GumboNode* node) {
@@ -27,20 +32,28 @@ void Parser::extractUrls(GumboNode* node) {
         
         std::string parsedUrl(href->value);
         
-        if (scheme(parsedUrl).has_value()) {
-            if (host(parsedUrl).value() == this->urlHost) {
-                this->urls.push_back(parsedUrl);
-            }
-        } else if (parsedUrl.size() > 1 && parsedUrl.front() == '/') {
-            if (parsedUrl[1] != '/') {
+        std::string parsedUrlScheme, parsedUrlHost, parsedUrlPath;
+        std::tie(parsedUrlScheme, parsedUrlHost, parsedUrlPath) = this->parseUrl(parsedUrl);
+        
+        if (parsedUrlPath.empty()) {
+            parsedUrlPath = "/";
+            parsedUrl += "/";
+        }
+        
+        if (!(this->isPageFragment(parsedUrl))) {
+            if (parsedUrlScheme != "") {
+                if (parsedUrlScheme == this->urlScheme && parsedUrlHost == this->urlHost) {
+                    this->urls.push_back(parsedUrl);
+                }
+            } else if (!parsedUrl.empty() && parsedUrl.front() == '/') {
                 parsedUrl = this->urlScheme + "://" + this->urlHost + parsedUrl;
                 this->urls.push_back(parsedUrl);
+            } else {
+                auto backslashPosition = this->url.find_last_of("/");
+                std::string url = this->url.substr(0, backslashPosition + 1);
+                
+                this->urls.push_back(url + parsedUrl);
             }
-        } else if (!parsedUrl.empty() && parsedUrl.front() != '#') {
-            std::string::iterator backslashPosition = std::find(this->urlPath.rbegin(), this->urlPath.rend(), '/').base();
-            std::string urlPath(this->urlPath.begin(), ++backslashPosition);
-            parsedUrl = this->urlScheme + "://" + this->urlHost + urlPath + parsedUrl;
-            this->urls.push_back(parsedUrl);
         }
     }
     
@@ -62,65 +75,6 @@ void Parser::parse() {
 
 const std::vector<std::string>& Parser::getUrls() const {
     return this->urls;
-}
-
-std::optional<std::string> Parser::scheme(const std::string& url) {
-    
-    auto found = url.find("://");
-    if (found != std::string::npos) {
-        return std::string(url, 0, found);
-    }
-    
-    return {};
-}
-
-std::optional<std::string> Parser::host(const std::string& url) {
-    
-    auto beginIndex = url.find("://");
-    if (beginIndex == std::string::npos) {
-        return {};
-    }
-    
-    beginIndex += 3;
-    
-    auto userInfoEnd = url.find('@', beginIndex);
-    if (userInfoEnd != std::string::npos) {
-        beginIndex = userInfoEnd + 1;
-    }
-    
-    auto endIndex = url.find(':', beginIndex);
-    if (endIndex != std::string::npos) {
-        return std::string(url, beginIndex, endIndex - beginIndex);
-    }
-    
-    endIndex = url.find('/', beginIndex);
-    if (endIndex != std::string::npos) {
-        return std::string(url, beginIndex, endIndex - beginIndex);
-    }
-    
-    return std::string(url, beginIndex, url.size() - beginIndex);;
-}
-
-std::optional<std::string> Parser::path(const std::string& url) {
-    auto beginIndex = url.find(":");
-    if (beginIndex == std::string::npos) {
-        return {};
-    }
-    
-    // For ignoring ://
-    beginIndex += 3;
-    
-    beginIndex = url.find('/', beginIndex);
-    if (beginIndex == std::string::npos) {
-        return "/";
-    }
-    
-    auto endIndex = url.rfind('/');
-    if (endIndex != std::string::npos) {
-        return std::string(url, beginIndex, endIndex - beginIndex);
-    }
-    
-    return "/";
 }
 
 const std::string& Parser::getTitle() const {
@@ -216,4 +170,47 @@ void Parser::extractDescription(GumboNode* node) {
     }
     
     return;
+}
+
+std::tuple<std::string, std::string, std::string> Parser::parseUrl(const std::string& url) const {
+    /*
+     scheme    = $2
+     authority = $4
+     path      = $5
+     query     = $7
+     fragment  = $9
+     */
+    std::regex urlRegex (
+                          R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)",
+                          std::regex::extended
+                          );
+    
+    std::smatch urlMatchResult;
+    if (std::regex_match(url, urlMatchResult, urlRegex)) {
+        return std::make_tuple(*(urlMatchResult.begin() + 2), *(urlMatchResult.begin() + 4), *(urlMatchResult.begin() + 5));
+    }
+    
+    return std::make_tuple("", "", "");
+}
+
+bool Parser::isPageFragment(const std::string& url) const {
+    /*
+     scheme    = $2
+     authority = $4
+     path      = $5
+     query     = $7
+     fragment  = $9
+     */
+    std::regex urlRegex (
+                          R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)",
+                          std::regex::extended
+                          );
+    
+    std::smatch urlMatchResult;
+    if (std::regex_match(url, urlMatchResult, urlRegex)) {
+        return !std::string(*(urlMatchResult.begin() + 8)).empty();
+    }
+    
+    // not valid url
+    return false;
 }

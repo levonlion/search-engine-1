@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <functional>
+#include <tuple>
 
 #include <gumbo.h>
 
@@ -93,6 +94,11 @@ private:
      * @return The path of url.
      */
     static std::optional<std::string> path(const std::string& url);
+    
+    
+    std::tuple<std::string, std::string, std::string> parseUrl(const std::string& url) const;
+    
+    bool isPageFragment(const std::string& url) const;
 
 public:
     
@@ -127,6 +133,7 @@ public:
      * @return All clean text.
      */
     const std::string& getAllText() const;
+   
 };
 
 #endif /* Parser_hpp */
