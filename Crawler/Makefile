@@ -1,8 +1,20 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall
+CXXFLAGS = -std=c++17
 
 # Libraries
-LDLIBS = -lcurl -I/usr/local/Cellar/gumbo-parser/0.10.1/include -L/usr/local/Cellar/gumbo-parser/0.10.1/lib -lgumbo
+CURL_LINKER_FLAG				= -lcurl
+
+GUMBO_COMPILER_FLAG 			= -I/usr/local/opt/gumbo-parser/include
+GUMBO_LINKER_FLAGS 				= -L/usr/local/opt/gumbo-parser/lib -lgumbo
+
+BOOST_COMPILER_FLAG 			= -I/usr/local/opt/boost/include
+BOOST_LINKER_FLAGS 				= -L/usr/local/opt/boost/lib -lboost_regex
+
+MYSQL_CONNECTOR_COMPILER_FLAG	= -I/usr/local/opt/mysql-connector-c++/include
+MYSQL_CONNECTOR_LINKER_FLAGS	= -L/usr/local/opt/mysql-connector-c++/lib -lmysqlcppconn8
+
+
+ALL_LINKER_FLAGS = ${CURL_LINKER_FLAG} ${GUMBO_LINKER_FLAGS} ${BOOST_LINKER_FLAGS} ${MYSQL_CONNECTOR_LINKER_FLAGS}
 
 # Names
 main = main
@@ -10,19 +22,25 @@ main = main
 all: $(main)
 
 $(main): $(main).o DocumentStore.o Document.o LinkStore.o Link.o PageLoader.o Page.o Parser.o WebsiteStore.o Website.o
-	$(CXX) $(CXXFLAGS) $(LDLIBS) $(main).o DocumentStore.o Document.o LinkStore.o Link.o PageLoader.o Page.o Parser.o WebsiteStore.o Website.o -o $(main)
+	$(CXX) $(CXXFLAGS) ${ALL_LINKER_FLAGS} $(main).o DocumentStore.o Document.o LinkStore.o Link.o PageLoader.o Page.o Parser.o WebsiteStore.o Website.o -o $(main)
 
 $(main).o: $(main).cpp
 	$(CXX) $(CXXFLAGS) -c $(main).cpp -o $(main).o
 
 DocumentStore.o: ./DocumentStore/DocumentStore.cpp
-	$(CXX) $(CXXFLAGS) -c ./DocumentStore/DocumentStore.cpp -o DocumentStore.o
+	$(CXX) $(CXXFLAGS) ${MYSQL_CONNECTOR_COMPILER_FLAG} -c ./DocumentStore/DocumentStore.cpp -o DocumentStore.o
 
 Document.o: ./DocumentStore/Document.cpp
 	$(CXX) $(CXXFLAGS) -c ./DocumentStore/Document.cpp -o Document.o
 
+WebsiteStore.o: ./WebsiteStore/WebsiteStore.cpp
+	$(CXX) $(CXXFLAGS) ${MYSQL_CONNECTOR_COMPILER_FLAG} ${BOOST_COMPILER_FLAG} -c ./WebsiteStore/WebsiteStore.cpp -o WebsiteStore.o
+
+Website.o: ./WebsiteStore/Website.cpp
+	$(CXX) $(CXXFLAGS) -c ./WebsiteStore/Website.cpp -o Website.o
+
 LinkStore.o: ./LinkStore/LinkStore.cpp
-	$(CXX) $(CXXFLAGS) -c ./LinkStore/LinkStore.cpp -o LinkStore.o
+	$(CXX) $(CXXFLAGS) ${MYSQL_CONNECTOR_COMPILER_FLAG} -c ./LinkStore/LinkStore.cpp -o LinkStore.o
 
 Link.o: ./LinkStore/Link.cpp
 	$(CXX) $(CXXFLAGS) -c ./LinkStore/Link.cpp -o Link.o
@@ -34,13 +52,7 @@ Page.o: ./PageLoader/Page.cpp
 	$(CXX) $(CXXFLAGS) -c ./PageLoader/Page.cpp -o Page.o
 
 Parser.o: ./Parser/Parser.cpp
-	$(CXX) $(CXXFLAGS) -c ./Parser/Parser.cpp -o Parser.o
-
-WebsiteStore.o: ./WebsiteStore/WebsiteStore.cpp
-	$(CXX) $(CXXFLAGS) -c ./WebsiteStore/WebsiteStore.cpp -o WebsiteStore.o
-
-Website.o: ./WebsiteStore/Website.cpp
-	$(CXX) $(CXXFLAGS) -c ./WebsiteStore/Website.cpp -o Website.o
+	$(CXX) $(CXXFLAGS) ${GUMBO_COMPILER_FLAG} -c ./Parser/Parser.cpp -o Parser.o
 
 clean:
 	rm *.o $(main)
