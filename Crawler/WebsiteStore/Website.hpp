@@ -8,8 +8,12 @@ class Website {
 private:
     
     /**
-     * The domain of the site. For example:
-     *    The domain of https://example.com/ is example.com
+     * The ID (identity document number) of the link.
+     */
+    int id;
+    
+    /**
+     * The domain of the site.
      */
     std::string domain;
     
@@ -18,31 +22,28 @@ private:
      */
     std::string homepage;
     
+    /**
+     * The last crawling time.
+     */
     time_t lastCrawlingTime;
-    //...
     
 public:
-    
-    Website() = default;
-    
+        
     /**
-     * @param domain The domain of the site. For example: the domain of https://example.com/ is example.com
+     * @param id The ID (identity document) of website.
+     * @param domain The domain of the site.
      * @param homepage The homepage url.
      * @param time The last crawling time.
      */
-    Website(const std::string& domain, const std::string& homepage, time_t time);
-    
-    Website(const Website&) = default;
-    
-    Website(Website&&) = default;
-    
-    Website& operator=(const Website&) = default;
+    Website(int id, const std::string& domain, const std::string& homepage, time_t time);
     
     const std::string& getDomain() const;
     
     const std::string& getHomepage() const;
     
     time_t getLastCrawlingTime() const;
+    
+    int getId() const;
 };
 
 

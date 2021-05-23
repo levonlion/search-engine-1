@@ -3,22 +3,20 @@
 
 #include <unordered_map>
 #include <vector>
+#include <mysqlx/xdevapi.h>
+#include <memory>
+
 #include "Website.hpp"
 
 class WebsiteStore {
     
 private:
-
-    /**
-     * All websites.
-     */
-    std::unordered_map<std::string, Website> all;
+    
+    std::shared_ptr<mysqlx::Client> client;
 
 public:
     
-    WebsiteStore() = default;
-    
-    WebsiteStore(const std::vector<Website>& websites);
+    WebsiteStore(std::shared_ptr<mysqlx::Client> client);
     
     /**
      * @return All websites.

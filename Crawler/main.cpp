@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <memory>
 #include "WebsiteStore/WebsiteStore.hpp"
 #include "LinkStore/LinkStore.hpp"
 #include "PageLoader/PageLoader.hpp"
@@ -7,40 +8,39 @@
 #include "DocumentStore/DocumentStore.hpp"
 
 int main() {
-    WebsiteStore websiteStore;
-    websiteStore.add(Website("rau.am", "https://rau.am", 0));
-//    websiteStore.add(Website("macrumors.com", "https://www.macrumors.com", 0));
-//    websiteStore.add(Website("google.com", "https://translate.google.com", 0));
-    const auto& websites = websiteStore.getAll();
+    std::shared_ptr<mysqlx::Client> client = std::make_shared<mysqlx::Client>("mysqlx://root:BD4bTxjlB9Jt@127.0.0.1:33060/Crawler");
     
-    LinkStore linkStore;
+    WebsiteStore websiteStore(client);
+    const auto websites = websiteStore.getAll();
+    
+    LinkStore linkStore(client);
+    DocumentStore documentStore(client);
     PageLoader pageLoader;
-    DocumentStore documentStore;
     for (const auto& website : websites) {
         
-        if (website.getLastCrawlingTime() + 60 > time(NULL)) {
+        if (website.getLastCrawlingTime() + 60 > std::time(nullptr)) {
             continue;
         }
-
-        const auto& homepageLink = linkStore.getBy(website.getHomepage());
+        
+        const auto homepageLink = linkStore.getBy(website.getHomepage());
         
         if (homepageLink.has_value()) {
-            linkStore.update(Link(website.getHomepage(), website.getDomain(), LinkStatus::WAITING, homepageLink.value().getLastLoadTime()));
+            linkStore.update(Link(-1, website.getHomepage(), website.getDomain(), LinkStatus::WAITING, 0));
         } else {
-            linkStore.add(Link(website.getHomepage(), website.getDomain(), LinkStatus::WAITING, 0));
+            linkStore.add(Link(-1, website.getHomepage(), website.getDomain(), LinkStatus::WAITING, 0));
         }
         
         while (true) {
-            const auto& links = linkStore.getBy(website.getDomain(), LinkStatus::WAITING, 10);
+            const auto links = linkStore.getBy(website.getDomain(), LinkStatus::WAITING, 10);
             
             if (links.empty()) {
                 break;
             }
             
             for (const auto& link : links) {
-                const auto& page = pageLoader.load(link.getUrl());
+                const auto page = pageLoader.load(link.getUrl());
                 if (page.isError() || page.getStatus() < 200 || page.getStatus() >= 300) {
-                    linkStore.update(Link(link.getUrl(), link.getDomain(), LinkStatus::ERROR, time(NULL)));
+                    linkStore.update(Link(link.getId(), link.getUrl(), link.getDomain(), LinkStatus::ERROR, std::time(nullptr)));
                     continue;
                 }
                 
@@ -48,37 +48,24 @@ int main() {
                 
                 parser.parse();
                 
-//                for (const std::string& u : parser.getUrls()) {
-//                    std::cout << u << std::endl;
-//                }
-                
-                // FIXME: Delete these printing ⬇️ (for testing textExtractor, titleExtractor, ...)
-//                std::cout << page.getUrl() << std::endl;
-//                std::cout << parser.getDescription() << std::endl;
-//                std::cout << parser.getTitle() << std::endl;
-//                std::cout << parser.getAllText() << std::endl;
-//                std::cout << "\n----------------------------------------\n" << std::endl;
-
                 // create document from parser and save
                 documentStore.save(Document(page.getUrl(), parser.getTitle(), parser.getDescription(), parser.getAllText()));
-                
-                // FIXME: Delete these printing ⬇️ (viewing documents)
-                for (const auto& elem : documentStore.getAll()) {
-                    std::cout << elem.getUrl() << std::endl;
-                }
-                std::cout << "\n----------------------------------------\n" << std::endl;
                 
                 for (const auto& newUrl : parser.getUrls()) {
                     if (linkStore.getBy(newUrl).has_value()) {
                         continue;
                     }
-                    linkStore.add(Link(newUrl, website.getDomain(), LinkStatus::WAITING, time(NULL)));
+                    linkStore.add(Link(-1, newUrl, website.getDomain(), LinkStatus::WAITING, std::time(nullptr)));
                 }
                 
-                linkStore.update(Link(link.getUrl(), link.getDomain(), LinkStatus::LOADED, time(NULL)));
+                linkStore.update(Link(-1, link.getUrl(), link.getDomain(), LinkStatus::LOADED, std::time(nullptr)));
+                
+                std::clog << "Documents: " << documentStore.count() << "\t" << "Links: " << linkStore.count() << std::endl;
             }
         }
         
-        websiteStore.update(Website(website.getDomain(), website.getHomepage(), time(NULL)));
+        websiteStore.update(Website(website.getId(), website.getDomain(), website.getHomepage(), std::time(nullptr)));
     }
+    
+    client->close();
 }

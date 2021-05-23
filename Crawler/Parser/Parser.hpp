@@ -8,6 +8,7 @@
 #include <tuple>
 
 #include <gumbo.h>
+#include <cpprest/uri_builder.h>
 
 class Parser {
     
@@ -16,22 +17,7 @@ private:
     /**
      * The effective url.
      */
-    std::string url;
-    
-    /**
-     * The effective url host.
-     */
-    std::string urlHost;
-    
-    /**
-     * The effective url path.
-     */
-    std::string urlPath;
-    
-    /**
-     * The effective url scheme.
-     */
-    std::string urlScheme;
+    web::uri url;
     
     /**
      * The entire HTML document.
@@ -79,26 +65,6 @@ private:
      * Extract content of the content attribute of <meta name="description" content="Some content">
      */
     void extractDescription(GumboNode* node);
-    
-    /**
-     * @return The scheme of url.
-     */
-    static std::optional<std::string> scheme(const std::string& url);
-    
-    /**
-     * @return The host of url.
-     */
-    static std::optional<std::string> host(const std::string& url);
-    
-    /**
-     * @return The path of url.
-     */
-    static std::optional<std::string> path(const std::string& url);
-    
-    
-    std::tuple<std::string, std::string, std::string> parseUrl(const std::string& url) const;
-    
-    bool isPageFragment(const std::string& url) const;
 
 public:
     

@@ -5,14 +5,17 @@
 #include <string>
 #include <vector>
 #include "Document.hpp"
+#include <mysqlx/xdevapi.h>
 
 class DocumentStore {
     
 private:
     
-    std::unordered_map<std::string, Document> all;
+    std::shared_ptr<mysqlx::Client> client;
     
 public:
+    
+    DocumentStore(std::shared_ptr<mysqlx::Client> client);
     
     std::vector<Document> getAll() const;
     

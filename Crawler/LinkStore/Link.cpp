@@ -1,7 +1,8 @@
 #include "Link.hpp"
 #include "LinkStatus.hpp"
 
-Link::Link(const std::string& url, const std::string& domain, const LinkStatus status, time_t time) {
+Link::Link(int id, const std::string& url, const std::string& domain, const LinkStatus status, time_t time) {
+    this->id = id;
     this->url = url;
     this->domain = domain;
     this->status = status;
@@ -9,19 +10,23 @@ Link::Link(const std::string& url, const std::string& domain, const LinkStatus s
 }
 
 time_t Link::getLastLoadTime() const {
-    return lastLoadTime;
+    return this->lastLoadTime;
 }
 
 std::string Link::getUrl() const {
-    return url;
+    return this->url;
 }
 
 std::string Link::getDomain() const {
-    return domain;
+    return this->domain;
 }
 
 LinkStatus Link::getStatus() const {
-    return status;
+    return this->status;
+}
+
+int Link::getId() const {
+    return this->id;
 }
 
 bool Link::operator==(const Link& other) {

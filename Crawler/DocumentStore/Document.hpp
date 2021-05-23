@@ -14,8 +14,6 @@ private:
     
 public:
     
-    Document() = default;
-    
     Document(const std::string& url, const std::string& title, const std::string& description, const std::string& allText);
     
     const std::string& getUrl() const;
