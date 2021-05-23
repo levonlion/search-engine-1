@@ -8,13 +8,16 @@ GUMBO_COMPILER_FLAG 			= -I/usr/local/opt/gumbo-parser/include
 GUMBO_LINKER_FLAGS 				= -L/usr/local/opt/gumbo-parser/lib -lgumbo
 
 BOOST_COMPILER_FLAG 			= -I/usr/local/opt/boost/include
-BOOST_LINKER_FLAGS 				= -L/usr/local/opt/boost/lib -lboost_regex
+BOOST_LINKER_FLAGS 				= -L/usr/local/opt/boost/lib
+
+CPPRESTSDK_COMPILER_FLAG		= -I/usr/local/opt/cpprestsdk/include
+CPPRESTSDK_LINKER_FLAG			= -L/usr/local/opt/cpprestsdk/lib -lcpprest
 
 MYSQL_CONNECTOR_COMPILER_FLAG	= -I/usr/local/opt/mysql-connector-c++/include
 MYSQL_CONNECTOR_LINKER_FLAGS	= -L/usr/local/opt/mysql-connector-c++/lib -lmysqlcppconn8
 
 
-ALL_LINKER_FLAGS = ${CURL_LINKER_FLAG} ${GUMBO_LINKER_FLAGS} ${BOOST_LINKER_FLAGS} ${MYSQL_CONNECTOR_LINKER_FLAGS}
+ALL_LINKER_FLAGS = ${CURL_LINKER_FLAG} ${GUMBO_LINKER_FLAGS} ${BOOST_LINKER_FLAGS} ${MYSQL_CONNECTOR_LINKER_FLAGS} ${CPPRESTSDK_LINKER_FLAG}
 
 # Names
 main = main
@@ -52,7 +55,7 @@ Page.o: ./PageLoader/Page.cpp
 	$(CXX) $(CXXFLAGS) -c ./PageLoader/Page.cpp -o Page.o
 
 Parser.o: ./Parser/Parser.cpp
-	$(CXX) $(CXXFLAGS) ${GUMBO_COMPILER_FLAG} -c ./Parser/Parser.cpp -o Parser.o
+	$(CXX) $(CXXFLAGS) ${GUMBO_COMPILER_FLAG} ${CPPRESTSDK_COMPILER_FLAG} -c ./Parser/Parser.cpp -o Parser.o
 
 clean:
 	rm *.o $(main)
