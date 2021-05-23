@@ -4,10 +4,6 @@
 #include <curl/curl.h>
 #include <iostream>
 
-PageLoader::PageLoader() {
-    
-}
-
 Page PageLoader::load(const std::string& url) {
     CURL* curl = curl_easy_init();
     
@@ -26,8 +22,14 @@ Page PageLoader::load(const std::string& url) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
         
-        // Perform the request, res will get the return code.
+        struct curl_slist* list = NULL;
+        list = curl_slist_append(list, "Accept: text/html");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+        
+        // Performs the request.
         requestResult = curl_easy_perform(curl);
+        
+        curl_slist_free_all(list);
         
         // Check for errors.
         if(requestResult != CURLE_OK) {
@@ -41,6 +43,14 @@ Page PageLoader::load(const std::string& url) {
             if (url != nullptr) {
                 effectiveUrl.append(url);
             }
+            
+            char* ct = nullptr;
+            int res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
+            if(!res && ct) {
+                if (std::string(ct).find("text/html") == std::string::npos) {
+                    responseCode = 406;
+                }
+            }
         }
         
         // Always cleanup.
@@ -50,12 +60,9 @@ Page PageLoader::load(const std::string& url) {
 }
 
 size_t PageLoader::curlCallback(char* contents, size_t size, size_t nmemb, std::string* s) {
-   size_t newLength = size * nmemb;
-   try {
-       s->append(contents, newLength);
-   } catch(std::bad_alloc &e) {
-       std::cerr <<  "memory problem" << std::endl;
-       return 0;
-   }
-   return newLength;
+    size_t newLength = size * nmemb;
+    
+    s->append(contents, newLength);
+    
+    return newLength;
 }

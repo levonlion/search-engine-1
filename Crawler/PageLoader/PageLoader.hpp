@@ -7,13 +7,11 @@
 class PageLoader {
     
 public:
-    
-    PageLoader();
 
     /**
      * @return The content of HTML document.
      */
-    Page load(const std::string& url);
+    static Page load(const std::string& url);
     
 private:
     
@@ -23,4 +21,4 @@ private:
     static size_t curlCallback(char* contents, size_t size, size_t nmemb, std::string* s);
 };
 
-#endif // !PageLoader_hpp
+#endif /* PageLoader_hpp */
