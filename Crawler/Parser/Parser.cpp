@@ -37,10 +37,10 @@ void Parser::extractUrls(GumboNode* node) {
                         this->urls.push_back(parsedUrlStr);
                     }
                 } else if (parsedUrlStr.front() == '/') {
-                    auto url = web::uri_builder(this->url).set_path(parsedUrl.path());
+                    auto url = web::uri_builder(this->url).set_path(parsedUrl.to_string());
                     this->urls.push_back(url.to_string());
                 } else {
-                    auto url = web::uri_builder(this->url).append_path(parsedUrl.path());
+                    auto url = web::uri_builder(this->url).append_path(parsedUrl.to_string());
                     this->urls.push_back(url.to_string());
                 }
             }
