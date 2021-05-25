@@ -18,7 +18,13 @@ Page PageLoader::load(const std::string& url) {
     std::string effectiveUrl;
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        
+        /* enable redirect following */
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        
+        /* allow three redirects */
+        curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
+        
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
         
